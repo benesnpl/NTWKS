@@ -85,18 +85,18 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-main" {
   vpc_id             = aws_vpc.fw_vpc.id
   appliance_mode_support = "enable"
   tags = {
-   Name = join("", [var.coid, "-HubVPC"])
+   Name = join("", [var.coid, "-Hub-VPC"])
   }
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-main_shr" {
   depends_on = [aws_ec2_transit_gateway.fw_tgw]
-  subnet_ids         = "${aws_subnet.Private.*.id}"
+  subnet_ids         = "${aws_subnet.Private_shr.*.id}"
   transit_gateway_id = aws_ec2_transit_gateway.fw_tgw.id
   vpc_id             = aws_vpc.shr_vpc.id
   appliance_mode_support = "enable"
   tags = {
-   Name = join("", [var.coid, "-SHRVPC"])
+   Name = join("", [var.coid, "-SHR-VPC"])
   }
 }
 
@@ -106,7 +106,7 @@ resource "aws_internet_gateway" "main_igw" {
   depends_on = [aws_ec2_transit_gateway.fw_tgw,aws_internet_gateway.main_igw]
   vpc_id = aws_vpc.fw_vpc.id
   tags = {
-    Name = join("", [var.coid, "-IGW"])
+    Name = join("", [var.coid, "FW-IGW"])
   }
 }
 
@@ -116,7 +116,7 @@ resource "aws_internet_gateway" "main_igw_shr" {
   depends_on = [aws_ec2_transit_gateway.fw_tgw,aws_internet_gateway.main_igw]
   vpc_id = aws_vpc.shr_vpc.id
   tags = {
-    Name = join("", [var.coid, "-IGW"])
+    Name = join("", [var.coid, "SHR-IGW"])
   }
 }
 
@@ -132,13 +132,14 @@ resource "aws_route_table" "public_rt" {
   
   
   tags = {
-    Name = ("Public-rt")
+    Name = ("keyf-us-e-Public-fw-rt")
   }
 }
 
 #RT Public - SHR
 
 resource "aws_route_table" "public_rt_shr" {
+  depends_on = [aws_ec2_transit_gateway.fw_tgw,aws_internet_gateway.main_igw_shr]
   vpc_id = aws_vpc.shr_vpc.id
   
   route {
@@ -172,7 +173,7 @@ resource "aws_route_table" "private_rt" {
 #Private_rt_shr
 
 resource "aws_route_table" "private_rt_shr" {
-  depends_on = [aws_internet_gateway.main_igw,aws_ec2_transit_gateway.fw_tgw,aws_vpn_connection.Miami]
+  depends_on = [aws_internet_gateway.main_igw_shr,aws_ec2_transit_gateway.fw_tgw,aws_vpn_connection.Miami]
   vpc_id = aws_vpc.shr_vpc.id
   
   route {
