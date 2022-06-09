@@ -106,7 +106,7 @@ resource "aws_internet_gateway" "main_igw" {
   depends_on = [aws_ec2_transit_gateway.fw_tgw,aws_internet_gateway.main_igw]
   vpc_id = aws_vpc.fw_vpc.id
   tags = {
-    Name = join("", [var.coid, "FW-IGW"])
+    Name = join("", [var.coid, "-FW-IGW"])
   }
 }
 
@@ -116,7 +116,7 @@ resource "aws_internet_gateway" "main_igw_shr" {
   depends_on = [aws_ec2_transit_gateway.fw_tgw,aws_internet_gateway.main_igw]
   vpc_id = aws_vpc.shr_vpc.id
   tags = {
-    Name = join("", [var.coid, "SHR-IGW"])
+    Name = join("", [var.coid, "-SHR-IGW"])
   }
 }
 
@@ -149,7 +149,7 @@ resource "aws_route_table" "public_rt_shr" {
   
   
   tags = {
-    Name = ("Public-rt")
+    Name = ("keyf-us-e-Public-shr-rt")
   }
 }
 
@@ -166,7 +166,7 @@ resource "aws_route_table" "private_rt" {
   
   
   tags = {
-    Name = ("Private-rt")
+    Name = ("keyf-us-e-Private-fw-rt")
   }
 }
 
@@ -183,7 +183,7 @@ resource "aws_route_table" "private_rt_shr" {
   
   
   tags = {
-    Name = ("Private-rt")
+    Name = ("keyf-us-e-Private-shr-rt")
   }
 }
 
@@ -239,7 +239,7 @@ resource "aws_route_table_association" "public_shr" {
     }
   }
   tags = {
-    Name = join("", [var.coid, "FW-Public-SG"])
+    Name = join("", [var.coid, "-FW-Public-SG"])
   }
 }
 
@@ -267,7 +267,7 @@ resource "aws_route_table_association" "public_shr" {
     }
   }
   tags = {
-    Name = join("", [var.coid, "SHR-Public-SG"])
+    Name = join("", [var.coid, "-SHR-Public-SG"])
   }
 }
 
@@ -295,7 +295,7 @@ resource "aws_route_table_association" "public_shr" {
     }
   }
   tags = {
-    Name = join("", [var.coid, "FW-Private-sg"])
+    Name = join("", [var.coid, "-FW-Private-sg"])
   }
 } 
 
@@ -323,7 +323,7 @@ resource "aws_route_table_association" "public_shr" {
     }
   }
   tags = {
-    Name = join("", [var.coid, "SHR-Private-sg"])
+    Name = join("", [var.coid, "-SHR-Private-sg"])
   }
 } 
 
