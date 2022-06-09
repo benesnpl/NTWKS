@@ -79,7 +79,7 @@ resource "aws_ec2_transit_gateway" "fw_tgw" {
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-main" {
-  depends_on = [aws_subnet.TGW,aws_ec2_transit_gateway.main_tgw]
+  depends_on = [aws_ec2_transit_gateway.fw_tgw]
   subnet_ids         = "${aws_subnet.Private.*.id}"
   transit_gateway_id = aws_ec2_transit_gateway.fw_tgw.id
   vpc_id             = aws_vpc.fw_vpc.id
@@ -90,7 +90,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-main" {
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-main_shr" {
-  depends_on = [aws_subnet.TGW,aws_ec2_transit_gateway.main_tgw]
+  depends_on = [aws_ec2_transit_gateway.fw_tgw]
   subnet_ids         = "${aws_subnet.Private.*.id}"
   transit_gateway_id = aws_ec2_transit_gateway.fw_tgw.id
   vpc_id             = aws_vpc.shr_vpc.id
@@ -103,7 +103,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-main_shr" {
 #IGW Creation - FW
 
 resource "aws_internet_gateway" "main_igw" {
-  depends_on = [aws_ec2_transit_gateway.main_tgw,aws_internet_gateway.main_igw]
+  depends_on = [aws_ec2_transit_gateway.fw_tgw,aws_internet_gateway.main_igw]
   vpc_id = aws_vpc.fw_vpc.id
   tags = {
     Name = join("", [var.coid, "-IGW"])
@@ -347,7 +347,7 @@ resource "aws_customer_gateway" "miami" {
 } 
 
   resource "aws_vpn_connection" "Oakbrook" {
-  transit_gateway_id  = aws_ec2_transit_gateway.main_tgw.id
+  transit_gateway_id  = aws_ec2_transit_gateway.fw_tgw.id
   customer_gateway_id = aws_customer_gateway.oakbrook.id
   type                = "ipsec.1"
   static_routes_only  = true
@@ -358,7 +358,7 @@ resource "aws_customer_gateway" "miami" {
 }
 
 resource "aws_vpn_connection" "Miami" {
-  transit_gateway_id  = aws_ec2_transit_gateway.main_tgw.id
+  transit_gateway_id  = aws_ec2_transit_gateway.fw_tgw.id
   customer_gateway_id = aws_customer_gateway.miami.id
   type                = "ipsec.1"
   static_routes_only  = true
